@@ -9,4 +9,4 @@ Aprendizado CRUD API
 <img width="40px" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg" title="Git"/>
 </p>
 
-Em resumo, este código cria uma aplicação Express simples que fornece operações CRUD (Create, Read, Update, Delete) para um conjunto de pessoas, utilizando o módulo PG 
+Em resumo, este código cria uma aplicação Express simples que fornece operações CRUD (Create, Read, Update, Delete) , utilizando o módulo PG 
