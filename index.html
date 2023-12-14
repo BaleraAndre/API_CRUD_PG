@@ -1,0 +1,114 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CRUD API</title>
+</head>
+<body>
+  <h1>CRUD API</h1>
+
+  <div>
+    <label for="nome">Nome:</label>
+    <input type="text" id="nome" required>
+    <label for="email">Email:</label>
+    <input type="email" id="email" required>
+    <button onclick="adicionarPessoa()">Adicionar Pessoa</button>
+  </div>
+
+  <h2>Pessoas</h2>
+  <ul id="listaPessoas"></ul>
+
+  <script>
+    const listaPessoasElement = document.getElementById('listaPessoas');
+    let pessoaParaAtualizar = null;
+
+    async function carregarPessoas() {
+      try {
+        const response = await fetch('/pessoas');
+        const pessoas = await response.json();
+
+        listaPessoasElement.innerHTML = '';
+
+        pessoas.forEach((pessoa) => {
+          const listItem = document.createElement('li');
+          listItem.textContent = `ID: ${pessoa.id}, Nome: ${pessoa.nome}, Email: ${pessoa.email}`;
+
+          const deleteButton = document.createElement('button');
+          deleteButton.textContent = 'Excluir';
+          deleteButton.addEventListener('click', () => deletarPessoa(pessoa.id));
+
+          const updateButton = document.createElement('button');
+          updateButton.textContent = 'Atualizar';
+          updateButton.addEventListener('click', () => prepararAtualizacao(pessoa));
+
+          listItem.appendChild(deleteButton);
+          listItem.appendChild(updateButton);
+          listaPessoasElement.appendChild(listItem);
+        });
+      } catch (error) {
+        console.error('Erro ao carregar pessoas:', error);
+      }
+    }
+
+    async function adicionarPessoa() {
+      const nome = document.getElementById('nome').value;
+      const email = document.getElementById('email').value;
+
+      if (pessoaParaAtualizar) {
+        const response = await fetch(`/pessoas/${pessoaParaAtualizar.id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ nome, email }),
+        });
+
+        const result = await response.json();
+        alert(result.mensagem);
+        pessoaParaAtualizar = null;
+      } else {
+        const response = await fetch('/pessoas', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ nome, email }),
+        });
+
+        const result = await response.json();
+        alert(result.mensagem);
+      }
+
+      carregarPessoas();
+      limparCampos();
+    }
+
+    async function deletarPessoa(id) {
+      const response = await fetch(`/pessoas/${id}`, {
+        method: 'DELETE',
+      });
+
+      const result = await response.json();
+      alert(result.mensagem);
+
+      carregarPessoas();
+    }
+
+    function prepararAtualizacao(pessoa) {
+      pessoaParaAtualizar = pessoa;
+      document.getElementById('nome').value = pessoa.nome;
+      document.getElementById('email').value = pessoa.email;
+    }
+
+    function limparCampos() {
+      pessoaParaAtualizar = null;
+      document.getElementById('nome').value = '';
+      document.getElementById('email').value = '';
+    }
+
+    document.addEventListener('DOMContentLoaded', carregarPessoas);
+  </script>
+</body>
+</html>
